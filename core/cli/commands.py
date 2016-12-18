@@ -89,15 +89,16 @@ class Run(Lobotomy):
                                 # Generate xref(s) and dref(s)
                                 self.vm.create_xref()
                                 self.vm.create_dref()
+                                return
                             else:
                                 CommandError("process_vm : Cannot analyze VM instance (!)")
                                 return
                         else:
                             CommandError("process_vm : Cannot load VM instance (!)")
                             return
-                else:
-                    CommandError("process_vm : classes.dex not found (!)")
-                    return
+                    else:
+                        CommandError("process_vm : classes.dex not found (!)")
+                        return
             if dex:
                 if self.dex:
                     from androguard.core.bytecodes.dvm import DalvikVMFormat
@@ -128,6 +129,7 @@ class Run(Lobotomy):
                             # Generate xref(s) and dref(s)
                             self.vm.create_xref()
                             self.vm.create_dref()
+                            return
                         else:
                             CommandError("process_vm :" +
                                          "Cannot analyze VM instance (!)")
@@ -136,9 +138,9 @@ class Run(Lobotomy):
                         CommandError("process_vm :" +
                                      "Cannot load VM instance (!)")
                         return
-            else:
-                CommandError("process_vm : classes.dex not found (!)")
-                return
+                else:
+                    CommandError("process_vm : classes.dex not found (!)")
+                    return
         except Exception as e:
             CommandError("process_vm : {}".format(e))
 
@@ -386,6 +388,18 @@ class Run(Lobotomy):
         except Exception as e:
             CommandError("class_tree : {}".format(e))
 
+    def do_ui(self, args):
+        """
+        := ui
+        """
+        try:
+            if self.vm and self.vmx:
+                from core.brains.ui.terminal import TerminalApp
+                ui = TerminalApp(self.vm, self.vmx)
+                ui.run()
+        except Exception as e:
+            CommandError("ui : {}".format(e))
+
     def do_macro(self, args):
         """
         := macro
@@ -401,7 +415,7 @@ class Run(Lobotomy):
             for f in listdir(macro):
                 for i in range(0, len(listdir(macro))):
                     print(self.t.cyan("\t--> [{}] {}".format(i, f)))
-            selection = raw_input(self.t.yellow("\n\t--> Select config : "))
+            selection = raw_input(self.t.yellow("\t--> Select config : "))
             print("\n")
             if selection:
                 for f in listdir(macro):
