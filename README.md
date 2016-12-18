@@ -1,6 +1,6 @@
 # Lobotomy
 ## Overview
-Lobotomy is a command line based Android reverse engineering tool. 
+Lobotomy is a command line based Android reverse engineering tool.  What is in the repo, is currently in development.  You should assume nothing works as expected until the official 2.0 release is finished.
 
 <table>
     <tr>
