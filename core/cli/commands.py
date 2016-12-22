@@ -235,6 +235,28 @@ class Run(Lobotomy):
         except Exception as e:
             CommandError(e.message)
 
+    def do_binja(self, args):
+        """
+        := binja
+        """
+        rpc = None
+        functions = None
+
+        try:
+            import xmlrpclib
+            rpc = xmlrpclib.ServerProxy('http://localhost:6666/lobotomy')
+            functions = rpc.jni()
+            if functions:
+                self.logger.log("info", "Found JNI methods (!)")
+                print("\n")
+                for f in functions:
+                    print(self.t.cyan("\t--> {}".format(f)))
+                print("\n")
+            else:
+                self.logger.info("Registered JNI functions not found (!)")
+        except Exception as e:
+            CommandError("binja : {}".format(e))
+
     def do_files(self, args):
         """
         := files all
