@@ -24,7 +24,7 @@ class AttackSurface(object):
 
     def activities(self):
         """
-        Analyze the attack surface for
+        Analyze the attack surface for activities
         """
         filters = None
         # TODO Enumerate the permission attribute for the activity element
@@ -33,7 +33,8 @@ class AttackSurface(object):
             if self.xml_activities:
                 for activity in self.xml_activities:
                     # Match the element name with the component name
-                    if activity.getAttribute("android:name") == a or activity.getAttribute("android.name").split(".")[-1] == a.split(".")[-1]:
+                    if activity.getAttribute("android:name") == a \
+                            or activity.getAttribute("android.name").split(".")[-1] == a.split(".")[-1]:
                         # Find the android:exported element attribute
                         if activity.getAttribute("android:exported"):
                             # Determine if the attribute is set to true
@@ -138,14 +139,12 @@ class AttackSurface(object):
                                     for path in paths:
                                         print(self.t.white("\t\t--> path : {}".format(path)))
                                     print("\n")
-                            else:
-                                continue
             else:
                 AttackSurfaceError("Activites not loaded from XML (!)")
 
     def receivers(self):
         """
-        Analyze the attack surface for
+        Analyze the attack surface for receivers
         """
         filters = None
         # TODO Enumerate the permission attribute for the activity element
@@ -193,14 +192,12 @@ class AttackSurface(object):
                                         for value in values:
                                             print(self.t.yellow("\t\t--> category : {}".format(value)))
                                 print("\n")
-                            else:
-                                return
             else:
                 AttackSurfaceError("Receivers not loaded from XML (!)")
 
     def services(self):
         """
-        Analyze the attack surface for
+        Analyze the attack surface for services
         """
         filters = None
         # TODO Enumerate the permission attribute for the service element
@@ -242,8 +239,6 @@ class AttackSurface(object):
                                         for value in values:
                                             print(self.t.yellow("\t\t--> action : {}".format(value)))
                                 print("\n")
-                            else:
-                                return
             else:
                 AttackSurfaceError("Services not loaded from XML (!)")
 

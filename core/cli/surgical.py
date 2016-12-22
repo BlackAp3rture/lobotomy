@@ -6,6 +6,7 @@ from core.brains.utilities.util import Util
 from core.brains.surgical.modules.intent import IntentModule
 from core.brains.surgical.modules.zip import ZipModule
 from core.brains.surgical.modules.socket import SocketModule
+from core.brains.surgical.modules.service import ServiceModule
 from pygments import highlight
 from pygments.lexers import JavaLexer
 from pygments.formatters import TerminalFormatter
@@ -30,7 +31,9 @@ class Run(SurgicalCmd):
         self.intent = IntentModule()
         self.zip = ZipModule()
         self.socket = SocketModule()
-        self.modules = [m for m in self.zip, self.intent, self.socket]
+        self.modules = [m for m in self.zip,
+                        self.intent,
+                        self.socket]
         self.target_module = None
         self.methods_api_usage = list()
 
@@ -97,8 +100,10 @@ class Run(SurgicalCmd):
             elif args.split()[0] == "select":
                 if self.target_module:
                     # TODO Consider building a wrapper around raw_input()
-                    class_selection = raw_input(self.t.yellow("[{}] ".format(datetime.now())) + "Select class : ")
-                    method_selection = raw_input(self.t.yellow("[{}] ".format(datetime.now())) + "Select method : ")
+                    class_selection = raw_input(self.t.yellow("[{}] "
+                                                              .format(datetime.now())) + "Select class : ")
+                    method_selection = raw_input(self.t.yellow("[{}] "
+                                                               .format(datetime.now())) + "Select method : ")
                     for k, v in self.target_module.model.values.items():
                         # This is so we can support classes with identical
                         # method names --> Ex: java.util.zip.ZipFile
@@ -138,7 +143,8 @@ class Run(SurgicalCmd):
                 # Select from the processed method list
                 elif args.split()[1] == "select":
                     if self.methods_api_usage:
-                        selection = raw_input(self.t.yellow("[{}] ".format(datetime.now())) + "Select method : ")
+                        selection = raw_input(self.t.yellow("[{}] "
+                                                            .format(datetime.now())) + "Select method : ")
                         for m in self.methods_api_usage:
                             if selection == m[0].name:
                                 print("\n")
@@ -147,8 +153,10 @@ class Run(SurgicalCmd):
                                 print(self.t.cyan("\t\t--> Method : {}"
                                                   .format(m[0].name)))
                                 print(self.t.cyan("\t\t\t --> XREFS ###########"))
-                                self.u.print_xref("T", m[1].method.XREFto.items)
-                                self.u.print_xref("F", m[1].method.XREFfrom.items)
+                                self.u.print_xref("T",
+                                                  m[1].method.XREFto.items)
+                                self.u.print_xref("F",
+                                                  m[1].method.XREFfrom.items)
                                 print("\n")
                                 print(highlight(m[2],
                                                 JavaLexer(),

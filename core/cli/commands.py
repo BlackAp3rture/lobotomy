@@ -427,6 +427,7 @@ class Run(Lobotomy):
         := macro
         """
         # Locals
+        directory_items = None
         macro = path.join(self.ROOT_DIR, "macro")
         selection = None
         apk_path = None
@@ -434,13 +435,15 @@ class Run(Lobotomy):
 
         try:
             print("\n")
-            for f in listdir(macro):
-                for i in range(0, len(listdir(macro))):
-                    print(self.t.cyan("\t--> [{}] {}".format(i, f)))
+            directory_items = listdir(macro)
+            for i in range(0, len(directory_items)):
+                print(self.t.cyan("\t--> [{}] {}"
+                                  .format(i, directory_items[i])))
+            print("\n")
             selection = raw_input(self.t.yellow("\t--> Select config : "))
             print("\n")
             if selection:
-                for f in listdir(macro):
+                for f in directory_items:
                     if selection == f:
                         with open("".join([macro, "/", f]), "rb") as config:
                             # Load the config as JSON
@@ -451,20 +454,15 @@ class Run(Lobotomy):
                                         if v:
                                             apk_path = str(v)
                                             # Call operate() with the path to
-                                            # the apk
+                                            # apk
                                             self.do_operate("apk {}"
                                                             .format(apk_path))
-                                            # TODO Add support for debuggable
-                                            # and decompilation modules
-                                            break
+                                            return
                                         else:
                                             CommandError("Path to APK not found in {}"
                                                          .format(selection))
                             else:
                                 CommandError("Error loading {} as JSON"
                                              .format(selection))
-                    else:
-                        CommandError("{} not found in the macro directory (!)"
-                                     .format(selection))
         except Exception as e:
             CommandError(e)

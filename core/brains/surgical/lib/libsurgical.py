@@ -6,11 +6,13 @@ class SurgicalLibError(Exception):
     def __init__(self, message):
         self.logger = Logger()
         self.message = message
-        self.logger.log("critical", "SurgicalLib : {}".format(self.message))
+        self.logger.surgical_log("critical", "SurgicalLib : {}"
+                                 .format(self.message))
 
 
 class SurgicalLib(object):
     def __init__(self, target_module, vmx, vm, k, selection, methods):
+        self.logger = Logger()
         self.target_module = target_module
         self.vmx = vmx
         self.vm = vm
@@ -75,6 +77,7 @@ class SurgicalLib(object):
                             if method.get_class_name() == p.get_src(self.vm.get_class_manager())[0]:
                                 found_methods.append(method)
             if found_methods:
+                self.logger.surgical_log("info", "Results found (!)")
                 process_methods = self.process_methods(found_methods)
                 if process_methods:
                     return process_methods
