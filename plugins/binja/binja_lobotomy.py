@@ -8,6 +8,12 @@ t = None
 running = False
 
 
+class ExceptionHandler(Exception):
+    def __init__(self, message):
+        self.message = message
+        print(message)
+
+
 class LobotomyRequestHandler(SimpleXMLRPCRequestHandler):
     rpc_paths = ('/lobotomy',)
 
@@ -18,6 +24,9 @@ class Lobotomy:
         self.bv = bv
 
     def jni(self):
+        """
+        Find all the registered JNI functions
+        """
         # Locals
         jni_found = list()
 
@@ -53,7 +62,7 @@ def start_lobotomy(bv):
             # Handle inbound requests
             rpc.handle_request()
     except Exception as e:
-        print("[!] Error starting the RPC server : {} (!)".format(e))
+        ExceptionHandler(e)
 
 
 def start_thread(bv):
@@ -71,7 +80,7 @@ def start_thread(bv):
         if not running:
             running = True
     except Exception as e:
-        print("[!] Error creating a new thread : {} (!)".format(e))
+        ExceptionHandler(e)
 
 
 # Register plugin
