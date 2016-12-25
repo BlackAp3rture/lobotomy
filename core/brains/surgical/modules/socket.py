@@ -26,6 +26,16 @@ class SocketModel:
             "getLocalPort",
             "getLocalSocketAddress",
             "isBound"
+        ],
+        "java.net.Socket":[
+            "bind",
+            "connect",
+            "getInetAddress",
+            "getInputStream",
+            "getLocalAddress",
+            "getLocalPort",
+            "getLocalSocketAddress",
+            "sendUrgentData",
         ]
     }
 
