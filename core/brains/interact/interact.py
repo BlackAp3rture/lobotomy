@@ -57,6 +57,20 @@ class Interact(object):
         except Exception as e:
             raise e
 
+    def get_classes(self):
+        """
+        Args:
+            None
+
+        Returns:
+            None
+        """
+        try:
+            for c in self.vm.get_classes():
+                print(c.name)
+        except Exception as e:
+            raise e
+
     def run(self):
         """
         Args:
@@ -65,6 +79,5 @@ class Interact(object):
         Returns:
             None
         """
-        ipshell = InteractiveShellEmbed(config=self.config,
-                                        banner1="Lobotomy Interactive")
+        ipshell = InteractiveShellEmbed(config=self.config, banner1="")
         ipshell()

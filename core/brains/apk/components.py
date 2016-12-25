@@ -37,13 +37,13 @@ class Components(object):
         """
         # TODO List comprehension
         # This is ugly fucking code ...
-        self.logger.log("info", "Loading components ...")
+        self.logger.log("info", "Loading components ...\n")
         try:
             if self.apk.get_activities():
                 for a in self.apk.get_activities():
                     self.activities.append(a)
                 if self.activities:
-                    print(self.t.yellow("\n\t--> Loaded activities (!)"))
+                    print(self.t.yellow("\t--> Loaded activities (!)"))
             if self.apk.get_services():
                 for s in self.apk.get_services():
                     self.services.append(s)

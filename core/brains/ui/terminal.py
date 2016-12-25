@@ -2,6 +2,9 @@ import npyscreen
 from core.logging.logger import Logger
 from androguard.core.bytecodes.dvm import ClassDefItem
 from androguard.core.bytecodes.dvm import EncodedMethod
+from pygments import highlight
+from pygments.lexers.dalvik import SmaliLexer
+from pygments.formatters import TerminalFormatter
 
 # Global
 # This global variables have to be accessed by the ClassTreeMultiSelect class
@@ -30,6 +33,17 @@ class ClassTreeData(npyscreen.TreeData):
             return self.content.name
         else:
             return self.content
+
+
+class TerminalMultiLine(npyscreen.MultiLine):
+    def display_value(self, vl):
+        """
+        Overriden from npyscreen.MultiLine
+        """
+        try:
+            return vl
+        except ReferenceError as e:
+            raise e
 
 
 class ClassTreeMultiSelect(npyscreen.MLTreeMultiSelect):
@@ -63,11 +77,14 @@ class ClassTreeMultiSelect(npyscreen.MLTreeMultiSelect):
                         basic_blocks = mx.get_basic_blocks().get()
                         method_form = npyscreen.Form(name=m.name,
                                                      framed=False)
-                        ml = method_form.add(npyscreen.MultiLine,
+                        # Our custom MultiLine class for handling displaying
+                        # the values
+                        ml = method_form.add(TerminalMultiLine,
                                              autowrap=False)
                         ml.values.append("{} {}"
                                          .format(m.get_access_flags_string(),
                                                  m.name))
+                        # This provide a visual space
                         ml.values.append("")
                         for block in basic_blocks:
                             for i in block.get_instructions():
@@ -85,7 +102,7 @@ class ClassTreeMultiSelect(npyscreen.MLTreeMultiSelect):
 
     def h_select(self, ch):
         """
-        Overidden from MLTreeMultiSelect
+        Overidden from npyscreen.MLTreeMultiSelect
         """
         # DO NOT MODIFY (!)
         vl = self.values[self.cursor_line]
@@ -111,7 +128,8 @@ class TerminalForm(npyscreen.Form):
         Overidden from npyscreen.Form
         """
         # Locals
-        self.how_exited_handers[npyscreen.wgwidget.EXITED_ESCAPE] = self.exit_application
+        self.how_exited_handers[
+            npyscreen.wgwidget.EXITED_ESCAPE] = self.exit_application
 
     def exit_application(self):
         """

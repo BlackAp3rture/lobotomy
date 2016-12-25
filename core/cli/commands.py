@@ -410,6 +410,29 @@ class Run(Lobotomy):
         except Exception as e:
             CommandError("class_tree : {}".format(e))
 
+    def do_native(self, args):
+        """
+        := native
+        """
+        native_methods = list()
+
+        try:
+            if self.vm:
+                for method in self.vm.get_methods():
+                    if method.get_access_flags() & 0x100:
+                        native_methods.append((method.get_class_name(),
+                                               method.get_name()))
+                if native_methods:
+                    print("\n")
+                    for n in native_methods:
+                        print(self.t.cyan("\t--> {} : {}".format(n[0], n[1])))
+                    print("\n")
+            else:
+                self.logger.log("info",
+                                "class_tree : classes.dex not loaded (!)")
+        except Exception as e:
+            CommandError("native : {}".format(e))
+
     def do_ui(self, args):
         """
         := ui
@@ -459,10 +482,10 @@ class Run(Lobotomy):
                                                             .format(apk_path))
                                             return
                                         else:
-                                            CommandError("Path to APK not found in {}"
+                                            CommandError("macro : Path to APK not found in {}"
                                                          .format(selection))
                             else:
-                                CommandError("Error loading {} as JSON"
+                                CommandError("macro : Error loading {} as JSON"
                                              .format(selection))
         except Exception as e:
-            CommandError(e)
+            CommandError("macro : {}".format(e))
