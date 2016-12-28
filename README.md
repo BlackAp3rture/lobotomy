@@ -1,4 +1,5 @@
 # Lobotomy
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 ## Overview
 Lobotomy is a command line based Android reverse engineering tool.  What is in the repo, is currently in development.  You should assume nothing works as expected until the official 2.0 release is finished.
 
