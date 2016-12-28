@@ -6,7 +6,7 @@ Lobotomy is a command line based Android reverse engineering tool.  What is in t
     <tr>
         <th>Version</th>
         <td>
-          Development 
+          <span style="color:red">Development</span>.
         </td>
     </tr>
     <tr>
