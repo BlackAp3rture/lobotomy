@@ -474,12 +474,19 @@ class Run(Lobotomy):
         try:
             if self.vm:
                 for c in self.vm.get_classes():
+                    # We don't care about Android support classes or resource
+                    # classes
+                    if c.name.startswith("Landroid") or \
+                            c.name.split("/")[-1].startswith("R"):
+                        continue
                     print("\n")
                     print(self.t.yellow("\t--> class : {}".format(c.name)))
                     for f in c.get_fields():
-                        print(self.t.white("\t\t--> field : {}".format(f.name)))
+                        print(self.t.white("\t\t--> field : {}"
+                                           .format(f.name)))
                     for m in c.get_methods():
-                        print(self.t.cyan("\t\t\t--> method : {}".format(m.name)))
+                        print(self.t.cyan("\t\t\t--> method : {}"
+                                          .format(m.name)))
                 print("\n")
             else:
                 CommandError("class_tree : classes.dex not loaded (!)")

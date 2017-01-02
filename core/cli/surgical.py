@@ -7,6 +7,7 @@ from core.brains.surgical.modules.intent import IntentModule
 from core.brains.surgical.modules.zip import ZipModule
 from core.brains.surgical.modules.socket import SocketModule
 from core.brains.surgical.modules.system import SystemModule
+from core.brains.surgical.modules.crypto import CryptoModule
 from pygments import highlight
 from pygments.lexers import JavaLexer
 from pygments.formatters import TerminalFormatter
@@ -32,10 +33,12 @@ class Run(SurgicalCmd):
         self.zip = ZipModule()
         self.socket = SocketModule()
         self.system = SystemModule()
+        self.crypto = CryptoModule()
         self.modules = [m for m in self.zip,
                         self.intent,
                         self.socket,
-                        self.system]
+                        self.system,
+                        self.crypto]
         self.target_module = None
         self.methods_api_usage = list()
 
