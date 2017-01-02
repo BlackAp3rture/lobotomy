@@ -545,31 +545,36 @@ class Run(Lobotomy):
         try:
             print("\n")
             directory_items = listdir(macro)
-            for i in range(0, len(directory_items)):
+            for i, item in enumerate(directory_items):
                 print(self.t.cyan("\t--> [{}] {}"
-                                  .format(i, directory_items[i])))
+                                  .format(i, item)))
             print("\n")
             selection = raw_input(self.t.yellow("\t--> Select config : "))
+            try:
+                index = int(selection)
+            except ValueError:
+                index = -1
             print("\n")
             if selection:
-                for f in directory_items:
-                    if selection == f:
-                        with open("".join([macro, "/", f]), "rb") as config:
-                            # Load the config as JSON
-                            json = loads(config.read())
-                            if json:
-                                for k, v in json.items():
-                                    if k == "apk":
-                                        if v:
-                                            apk_path = str(v)
-                                            # Call operate() with the path to
-                                            # apk
-                                            self.do_operate("apk {}"
-                                                            .format(apk_path))
-                                            return
-                                        else:
-                                            CommandError("macro : Path to APK not found in {}"
-                                                         .format(selection))
+                for i, item in enumerate(directory_items):
+                    if selection == item or i == index:
+                        selection = item
+                        break
+                with open("".join([macro, "/", selection]), "rb") as config:
+                    # Load the config as JSON
+                    json = loads(config.read())
+                    if json:
+                        for k, v in json.items():
+                            if k == "apk":
+                                if v:
+                                    apk_path = str(v)
+                                    # Call operate() with the path to apk
+                                    self.do_operate("apk {}"
+                                                    .format(apk_path))
+                                    return
+                                else:
+                                    CommandError("macro : Path to APK not found in {}"
+                                                 .format(selection))
                             else:
                                 CommandError("macro : Error loading {} as JSON"
                                              .format(selection))
