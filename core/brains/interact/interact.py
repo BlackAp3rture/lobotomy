@@ -34,6 +34,9 @@ class Interact(object):
                     if name == c.name:
                         return c
                         break
+                    elif name in c.name:
+                        return c
+                        break
         except Exception as e:
             raise e
 

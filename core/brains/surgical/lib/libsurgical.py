@@ -37,20 +37,25 @@ class SurgicalLib(object):
         unique = list()
         processed = list()
 
-        for m in found_methods:
-            if m.get_class_name() not in seen:
-                unique.append(m)
-                seen.add(m.get_class_name())
-        for u in unique:
-            if u.get_code():
-                analyzed = self.vmx.get_method(u)
-                src = decompile.DvMethod(analyzed)
-                src.process()
-                processed.append((u, analyzed, src.get_source()))
-            else:
-                analyzed = self.vmx.get_method(u)
-                processed.append((u, analyzed, None))
-        return processed
+        try:
+            for m in found_methods:
+                if m.get_class_name() not in seen:
+                    unique.append(m)
+                    seen.add(m.get_class_name())
+            for u in unique:
+                if u.get_code():
+                    analyzed = self.vmx.get_method(u)
+                    src = decompile.DvMethod(analyzed)
+                    src.process()
+                    processed.append((u, analyzed, src.get_source()))
+                else:
+                    analyzed = self.vmx.get_method(u)
+                    processed.append((u, analyzed, None))
+            return processed
+        except Exception as e:
+            SurgicalLibError("process_methods : {}".format(e))
+            if "Instruction31c" in e.message:
+                pass
 
     def search(self):
         """

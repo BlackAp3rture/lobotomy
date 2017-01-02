@@ -1,9 +1,14 @@
 from cmd2 import Cmd as Lobotomy
 from core.logging.logger import Logger
+from functools import wraps
 from blessings import Terminal
 from core.brains.utilities.util import Util
 from os import path, listdir
 from json import loads
+import readline
+# DO NOT REMOVE
+# Fix for cmd2 that enables command auto-complete
+readline.parse_and_bind("bind ^I rl_complete")
 
 
 class CommandError(Exception):
@@ -11,6 +16,35 @@ class CommandError(Exception):
         self.logger = Logger()
         self.message = message
         self.logger.log("critical", "Command : {}".format(self.message))
+
+
+class CmdArgumentException(Exception):
+    def __init__(self, cmdargs=None, doc=""):
+        self.t = Terminal()
+        if not cmdargs:
+            cmdargs = None
+        self.cmdargs = cmdargs
+        self.doc = doc
+
+    def __str__(self):
+        msg = [self.doc]
+        if self.cmdargs:
+            msg.insert(0, "\n\t{0} : {1} (!)".format("Command not found",
+                                                 self.cmdargs))
+        return "\n\n".join(msg)
+
+
+def cmd_arguments(expected_args):
+    def decorator(func):
+        func._expected_args = expected_args
+        @wraps(func)
+        def wrapper(self, *args):
+            if args[0].split(" ")[0] not in expected_args:
+                raise CmdArgumentException(cmdargs=args[0].split(" ")[0],
+                                           doc=func.func_doc)
+            return func(self, *args)
+        return wrapper
+    return decorator
 
 
 class Run(Lobotomy):
@@ -32,6 +66,13 @@ class Run(Lobotomy):
         self.permissions_details = None
         self.files = None
         self.attack_surface = None
+
+    def _cmd_completer(self, name, text, line, begidx, endidx):
+        fn = getattr(self, 'do_'+name)
+        if not hasattr(fn.im_func, "_expected_args"):
+            return []
+        a = [arg for arg in fn.im_func._expected_args if arg.startswith(text)]
+        return a
 
     def find_dex(self):
         """
@@ -144,22 +185,29 @@ class Run(Lobotomy):
         except Exception as e:
             CommandError("process_vm : {}".format(e))
 
-    def do_operate(self, args):
+    def complete_operate(self, *args):
+        return self._cmd_completer("operate", *args)
+
+    @cmd_arguments(["apk", "dex"])
+    def do_operate(self, *args):
         """
         := operate apk path_to_apk
         := operate dex path_to_classes.dex
         """
+        # Locals
+        arg0 = args[0].split(" ")[0]
+        arg1 = args[0].split(" ")[1]
+
         try:
-            if args.split()[0] == "apk":
-                if args.split()[1]:
+            if arg0 == "apk":
+                if arg1:
                     self.logger.log("info", "Loading : {} ..."
-                                    .format(args.split()[1].split("/")[-1]))
+                                    .format(arg1.split("/")[-1]))
                     from androguard.core.bytecodes.apk import APK
-                    self.apk = APK(args.split()[1])
+                    self.apk = APK(arg1)
                     if self.apk:
                         print(self.t.yellow("\n\t--> Loaded : {} (!)\n"
-                                            .format(args.split()[1]
-                                                    .split("/")[-1])))
+                                            .format(arg1.split("/")[-1])))
                         self.package = self.apk.get_package()
                         from core.brains.apk.components import Components
                         # Load activies, services, broadcast receivers, and
@@ -173,25 +221,22 @@ class Run(Lobotomy):
                         self.process_vm(apk=True)
                     else:
                         CommandError("APK not loaded (!)")
-            elif args.split()[0] == "dex":
-                self.logger.log("info", "Loading : {} ..."
-                                .format(args.split()[1].split("/")[-1]))
-                if args.split()[1]:
-                    self.dex = args.split()[1]
-                    # Process DVM
+            elif arg0 == "dex":
+                if arg1:
+                    self.logger.log("info", "Loading : {} ..."
+                                    .format(arg1.split("/")[-1]))
+                    self.dex = arg1
                     self.process_vm(dex=True)
-            else:
-                CommandError("Unkown command (!)")
         except ImportError as e:
-            CommandError(e.message)
-        except IndexError as e:
-            CommandError("Not enough arguments (!)")
+            CommandError("operate : {}".format(e))
 
-    def do_surgical(self, args):
+    def complete_surgical(self, *args):
+        return self._cmd_completer("surgical", *args)
+
+    def do_surgical(self, *args):
         """
         := surgical
         """
-
         try:
             if self.vm and self.vmx:
                 from .surgical import Run
@@ -202,9 +247,12 @@ class Run(Lobotomy):
             else:
                 CommandError("classes.dex not loaded (!)")
         except Exception as e:
-            CommandError(e.message)
+            CommandError("surgical : {}".format(e))
 
-    def do_attacksurface(self, args):
+    def complete_attacksurface(self, *args):
+        return self._cmd_completer("attacksurface", *args)
+
+    def do_attacksurface(self, *args):
         """
         := attacksurface
         """
@@ -217,15 +265,22 @@ class Run(Lobotomy):
                 # Helps with visual spacing after the results are printed
                 print("\n")
         except ImportError as e:
-            CommandError(e.message)
+            CommandError("attacksurface : {}".format(e))
 
-    def do_permissions(self, args):
+    def complete_permissions(self, *args):
+        return self._cmd_completer("permissions", *args)
+
+    @cmd_arguments(["list"])
+    def do_permissions(self, *args):
         """
         := permissions list
         """
+        # Locals
+        arg0 = args[0]
+
         try:
             if self.permissions:
-                if args.split()[0] == "list":
+                if args[0] == "list":
                     self.logger.log("info", "Loading permissions ... \n")
                     for p in self.permissions:
                         print(self.t.yellow("\t--> {}".format(p)))
@@ -233,9 +288,12 @@ class Run(Lobotomy):
             else:
                 CommandError("Permissions not found (!)")
         except Exception as e:
-            CommandError(e.message)
+            CommandError("permissions : {}".format(e))
 
-    def do_binja(self, args):
+    def complete_binja(self, *args):
+        return self._cmd_completer("binja", *args)
+
+    def do_binja(self, *args):
         """
         := binja
         """
@@ -257,57 +315,67 @@ class Run(Lobotomy):
         except Exception as e:
             CommandError("binja : {}".format(e))
 
-    def do_files(self, args):
+    def complete_files(self, *args):
+        return self._cmd_completer("files", *args)
+
+    @cmd_arguments(["all", "assets", "libs", "res"])
+    def do_files(self, *args):
         """
         := files all
         := files assets
         := files libs
         := files res
         """
+        # Locals
+        arg0 = args[0]
+
         try:
             if self.files:
-                if args.split()[0]:
-                    if args.split()[0] == "assets":
-                        self.logger.log("info", "Loading files ... \n")
-                        for f in self.files:
-                            if f.startswith("assets"):
-                                print(self.t.yellow("\t--> {}".format(f)))
-                        print("\n")
-                    elif args.split()[0] == "libs":
-                        self.logger.log("info", "Loading files ... \n")
-                        for f in self.files:
-                            if f.startswith("lib"):
-                                print(self.t.yellow("\t--> {}".format(f)))
-                        print("\n")
-                    elif args.split()[0] == "res":
-                        self.logger.log("info", "Loading files ... \n")
-                        for f in self.files:
-                            if f.startswith("res"):
-                                print(self.t.yellow("\t--> {}".format(f)))
-                        print("\n")
-                    elif args.split()[0] == "all":
-                        self.logger.log("info", "Loading files ... \n")
-                        for f in self.files:
+                if arg0 == "assets":
+                    self.logger.log("info", "Loading files ... \n")
+                    for f in self.files:
+                        if f.startswith("assets"):
                             print(self.t.yellow("\t--> {}".format(f)))
-                        print("\n")
+                    print("\n")
+                elif arg0 == "libs":
+                    self.logger.log("info", "Loading files ... \n")
+                    for f in self.files:
+                        if f.startswith("lib"):
+                            print(self.t.yellow("\t--> {}".format(f)))
+                    print("\n")
+                elif arg0 == "res":
+                    self.logger.log("info", "Loading files ... \n")
+                    for f in self.files:
+                        if f.startswith("res"):
+                            print(self.t.yellow("\t--> {}".format(f)))
+                    print("\n")
+                elif arg0 == "all":
+                    self.logger.log("info", "Loading files ... \n")
+                    for f in self.files:
+                        print(self.t.yellow("\t--> {}".format(f)))
+                    print("\n")
             else:
                 CommandError("Files not populated (!)")
         except Exception as e:
-            CommandError(e.message)
+            CommandError("files : {}".format(e))
 
-    def do_strings(self, args):
+    def complete_strings(self, *args):
+        return self._cmd_completer("strings", *args)
+
+    @cmd_arguments(["list", "search"])
+    def do_strings(self, *args):
         """
         List and search for strings found in classes.dex
 
         := strings list
         := strings search
         """
-
         # Locals
+        arg0 = args[0]
         strings = None
 
         try:
-            if args.split()[0] == "list":
+            if arg0 == "list":
                 if self.vm:
                     strings = self.vm.get_strings()
                     if strings:
@@ -318,7 +386,7 @@ class Run(Lobotomy):
                         CommandError("Strings not found (!)")
                 else:
                     CommandError("classes.dex not loaded (!)")
-            elif args.split()[0] == "search":
+            elif arg0 == "search":
                 if self.vm:
                     strings = self.vm.get_strings()
                     if strings:
@@ -331,21 +399,25 @@ class Run(Lobotomy):
                         CommandError("Strings not found (!)")
                 else:
                     CommandError("classes.dex not loaded (!)")
-            else:
-                CommandError("Command not found (!)")
         except Exception as e:
             # We might be see an exception like this:
             # 'utf8' codec can't decode byte 0xc0 in position 0:
             # invalid start byte
-            raise e
-            CommandError(e.message)
+            CommandError("strings : {}".format(e))
 
-    def do_components(self, args):
+    def complete_components(self, *args):
+        return self._cmd_completer("components", *args)
+
+    @cmd_arguments(["list"])
+    def do_components(self, *args):
         """
         := components list
         """
+        # Locals
+        arg0 = args[0]
+
         try:
-            if args.split()[0] == "list":
+            if arg0 == "list":
                 if self.apk:
                     self.logger.log("info", "Enumerating components ...\n")
                     if self.components.activities:
@@ -370,12 +442,13 @@ class Run(Lobotomy):
                         print("\n")
                 else:
                     CommandError("APK not loaded (!)")
-            else:
-                CommandError("Command not found (!)")
         except Exception as e:
-            CommandError(e.message)
+            CommandError("components : {}".format(e))
 
-    def do_interact(self, args):
+    def complete_interact(self, *args):
+        return self._cmd_completer("interact", *args)
+
+    def do_interact(self, *args):
         """
         Drop into an interactive IPython session.
 
@@ -389,9 +462,12 @@ class Run(Lobotomy):
             else:
                 CommandError("classes.dex not loaded (!)")
         except Exception as e:
-            CommandError(e.message)
+            CommandError("interact : {}".format(e.message))
 
-    def do_class_tree(self, args):
+    def complete_class_tree(self, *args):
+        return self._cmd_completer("class_tree", *args)
+
+    def do_class_tree(self, *args):
         """
         := class_tree
         """
@@ -410,10 +486,14 @@ class Run(Lobotomy):
         except Exception as e:
             CommandError("class_tree : {}".format(e))
 
-    def do_native(self, args):
+    def complete_native(self, *args):
+        return self._cmd_completer("native", *args)
+
+    def do_native(self, *args):
         """
         := native
         """
+        # Locals
         native_methods = list()
 
         try:
@@ -433,7 +513,10 @@ class Run(Lobotomy):
         except Exception as e:
             CommandError("native : {}".format(e))
 
-    def do_ui(self, args):
+    def complete_ui(self, *args):
+        return self._cmd_completer("ui", *args)
+
+    def do_ui(self, *args):
         """
         := ui
         """
@@ -444,6 +527,9 @@ class Run(Lobotomy):
                 ui.run()
         except Exception as e:
             CommandError("ui : {}".format(e))
+
+    def complete_macro(self, *args):
+        return self._cmd_completer("macro", *args)
 
     def do_macro(self, args):
         """
