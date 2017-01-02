@@ -90,3 +90,6 @@ python lobotomy.py
 ```
 
 See the [docs](https://github.com/rotlogix/lobotomy/tree/master/docs) for more information.
+
+## Examples
+[![asciicast](https://asciinema.org/a/97809.png)](https://asciinema.org/a/97809)
