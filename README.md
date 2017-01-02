@@ -1,4 +1,5 @@
 # Lobotomy
+[![Hex.pm](https://img.shields.io/hexpm/l/plug.svg)]()
 ## Overview
 Lobotomy is a command line based Android reverse engineering tool.  What is in the repo, is currently in development.  You should assume nothing works as expected until the official 2.0 release is finished.
 
@@ -6,7 +7,7 @@ Lobotomy is a command line based Android reverse engineering tool.  What is in t
     <tr>
         <th>Version</th>
         <td>
-          Development 
+          Development
         </td>
     </tr>
     <tr>
@@ -17,19 +18,21 @@ Lobotomy is a command line based Android reverse engineering tool.  What is in t
 
 ### Features
     
-|Feature|Description|
-|:------|-----------|
-|Components|Enumerate AndroidManifest.xml components|
-|Permission|Enumerate declared and used ```AndroidManifest.xml``` permissions|
-|Strings   |List and search for strings within the target application|
-|AttackSurface|Enumerate the target Application's attack surface through parsing the ```AndroidManifest.xml```|
-|Surgical|Find specific Android API usage throughout the application|
-|Interact|Drop into an IPython session to analyze the target application in a more granular fashion|
-|UI|A terminal based interface for navigating an application's class tree|
-|Decompile|Decompile the target application with ```Apktool```|
-|Debuggable|Convert the target application into being debuggable when installed on a device|
-|Dextra|Wrapper around ```dextra``` for dumping ```odex``` and ```oat``` files|
-|Socket|Find local and listening sockets on a target Android device|
+|Feature|Description-|Status|
+|:------|:-----------|:-----|
+|Components|Enumerate AndroidManifest.xml components|+|
+|Permission|Enumerate declared and used ```AndroidManifest.xml``` permissions|+|
+|Strings   |List and search for strings within the target application|+|
+|AttackSurface|Enumerate the target Application's attack surface through parsing the ```AndroidManifest.xml```|+|
+|Surgical|Find specific Android API usage throughout the application|+|
+|Interact|Drop into an IPython session to analyze the target application in a more granular fashion|+|
+|Binja|Binary Ninja plugin|+|
+|UI|A terminal based interface for navigating an application's class tree|-|
+|Decompile|Decompile the target application with ```Apktool```|-|
+|Debuggable|Convert the target application into being debuggable when installed on a device|-|
+|Dextra|Wrapper around ```dextra``` for dumping ```odex``` and ```oat``` files|-|
+|Socket|Find local and listening sockets on a target Android device|-|
+|Scalpel|Frida integration|-|
 
 
 ### Building 
