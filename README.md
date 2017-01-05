@@ -18,7 +18,7 @@ Lobotomy is a command line based Android reverse engineering tool.  What is in t
 
 ### Features
     
-|Feature|Description-|Status|
+|Feature|Description |Status|
 |:------|:-----------|:-----|
 |Components|Enumerate AndroidManifest.xml components|+|
 |Permission|Enumerate declared and used ```AndroidManifest.xml``` permissions|+|
