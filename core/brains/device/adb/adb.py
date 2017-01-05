@@ -1,3 +1,16 @@
+class ADBPaths(object):
+    @staticmethod
+    def adb_bin(base_dir):
+        return os.path.join(base_dir, "bin", "adb")
+
+    @staticmethod
+    def frida_bin(base_dir):
+        return os.path.join(base_dir, "bin", "frida-server")
+
+    @staticmethod
+    def frida_dev_path():
+        return "/data/local/tmp/frida-server"
+
 class ADB(object):
     def __init__(self, base_path):
         self.adb = ADBPaths.adb_bin(base_path)
