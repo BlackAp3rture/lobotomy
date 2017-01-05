@@ -19,6 +19,7 @@ class ADBPaths(object):
 
 class ADB(object):
     def __init__(self, base_path):
+        self.logger = Logger()
         self.adb = ADBPaths.adb_bin(base_path)
         self.serial = " "
 
@@ -53,8 +54,8 @@ class ADB(object):
             if wait:
                 stdout,stderr = p.communicate()
                 if p.returncode:
-                    Logger.log("critical", stderr)
-                    raise OSError(stderr)
+                    self.logger.log("critical", stderr)
+                    return
                 return (stdout, stderr)
             else:
                 return ("", "")
@@ -153,39 +154,39 @@ class Device(object):
         stderr = None
         
         try:
-            Logger.log("info", "Checking for if Frida Agent is running ...")
+            self.logger.log("info", "Checking for if Frida Agent is running ...")
             if self.is_frida_running():
                 # Frida is already initialized, return
-                Logger.log("info", "Frida is running (!)")
+                self.logger.log("info", "Frida is running (!)")
                 return
             # Frida has not been initialized, check to see if the agent is on the target device
-            Logger.log("critical", "Frida is not running (!)")
-            Logger.log("info", "Checking for the frida-server binary")
+            self.logger.log("critical", "Frida is not running (!)")
+            self.logger.log("info", "Checking for the frida-server binary")
             stdout,stderr = self.su("ls %s" % self.frida_dev_path)
             # If the Frida agent is not on the device, attempt to push it
             if "No such file or directory" in stdout:
-                Logger.log("critical", "Frida-server is not on the device (!)")
-                Logger.log("info", "Copying frida-server to device")
+                self.logger.log("critical", "Frida-server is not on the device (!)")
+                self.logger.log("info", "Copying frida-server to device")
                 # Push frida-server
                 self.adb.push(self.frida_bin, self.frida_dev_path)
                 # Set up the permissions
                 self.su("chmod 755 %s" % self.frida_dev_path)
-                Logger.log("info", "Verifying copy ...")
+                self.logger.log("info", "Verifying copy ...")
                 stdout,stderr = self.su("ls {}".format(self.frida_dev_path))
                 # Handle if we could not push the agent to the target device
                 if "No such file or directory" in stdout:
-                    Logger.log("critical", "Could not copy frida-server to device (!)")
+                    self.logger.log("critical", "Could not copy frida-server to device (!)")
                     return
-            Logger.log("info", "Attempting to launch the Frida agent ...")
+            self.logger.log("info", "Attempting to launch the Frida agent ...")
             stdout,stderr = self.su("%s &" % self.frida_dev_path, wait=False)
             # This may need to be adjusted
             time.sleep(1)
-            Logger.log("info", "Checking for if Frida Agent is running ...")
+            self.logger.log("info", "Checking for if Frida Agent is running ...")
             # If the Frida agent is running, return
             if self.is_frida_running():
-                Logger.log("info", "Frida is running (!)")
+                self.logger.log("info", "Frida is running (!)")
                 return
-            Logger.log("critical", "Frida is not running (!)")
+            self.logger.log("critical", "Frida is not running (!)")
             return
         except Exception as e:
             raise e
@@ -212,18 +213,17 @@ class Device(object):
         Returns:
             None
         """
-        
         if self.is_frida_running():
-            Logger.log("info", "Killing Frida agent (!)")
+            self.logger.log("info", "Killing Frida agent (!)")
             self.kill_frida()
             time.sleep(.5)
         if self.is_frida_running():
-            Logger.log("critical", "Frida agent still running (!)")
-        Logger.log("info", "Deleting the frida-server binary (!)")
+            self.logger.log("critical", "Frida agent still running (!)")
+        self.logger.log("info", "Deleting the frida-server binary (!)")
         self.su("rm -f %s" % self.frida_dev_path)
         stdout,stderr = self.su("ls %s" % self.frida_dev_path)
         if not "No such file or directory" in stdout:
-            Logger.log("critical", "Frida agent unable to be removed (!)")
+            self.logger.log("critical", "Frida agent unable to be removed (!)")
 
 
 def enumerate_devices(project_dir):
