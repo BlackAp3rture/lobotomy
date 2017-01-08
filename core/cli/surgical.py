@@ -190,7 +190,6 @@ class Run(SurgicalCmd):
                     arg1 = args[0].split(" ")[1]
                     # List the methods that have been processed
                     if arg1 == "list":
-                        print(self.methods_api_usage)
                         if self.methods_api_usage:
                             print("\n")
                             for i, m in enumerate(self.methods_api_usage):
