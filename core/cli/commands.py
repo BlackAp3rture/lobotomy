@@ -380,8 +380,7 @@ class Run(Lobotomy):
                     strings = self.vm.get_strings()
                     if strings:
                         for s in strings:
-                            print(self.t.cyan("--> {}"
-                                              .format(s.encode("utf-8"))))
+                            print(self.t.cyan("--> {}".format(s.encode("utf-8", errors="ignore"))))
                     else:
                         CommandError("Strings not found (!)")
                 else:
@@ -393,16 +392,13 @@ class Run(Lobotomy):
                         target = raw_input(self.t.yellow("\n\t--> Enter string : "))
                         for s in strings:
                             if target in s:
-                                print(self.t.cyan("\t\t --> {}".format(s)))
+                                print(self.t.cyan("\t\t --> {}".format(s.encode("utf-8", errors="ignore"))))
                         print("\n")
                     else:
                         CommandError("Strings not found (!)")
                 else:
                     CommandError("classes.dex not loaded (!)")
         except Exception as e:
-            # We might be see an exception like this:
-            # 'utf8' codec can't decode byte 0xc0 in position 0:
-            # invalid start byte
             CommandError("strings : {}".format(e))
 
     def complete_components(self, *args):
