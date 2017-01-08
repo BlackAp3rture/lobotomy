@@ -5,6 +5,7 @@ from blessings import Terminal
 from core.brains.utilities.util import Util
 from os import path, listdir
 from json import loads
+from datetime import datetime
 import readline
 # DO NOT REMOVE
 # Fix for cmd2 that enables command auto-complete
@@ -476,13 +477,11 @@ class Run(Lobotomy):
                             c.name.split("/")[-1].startswith("R"):
                         continue
                     print("\n")
-                    print(self.t.yellow("\t--> class : {}".format(c.name)))
+                    print(self.t.yellow("\t--> class : {} {}".format(c.get_access_flags_string(), c.name)))
                     for f in c.get_fields():
-                        print(self.t.white("\t\t--> field : {}"
-                                           .format(f.name)))
+                        print(self.t.white("\t\t--> field : {} {} {}".format(f.get_access_flags_string(), f.get_descriptor(), f.name)))
                     for m in c.get_methods():
-                        print(self.t.cyan("\t\t\t--> method : {}"
-                                          .format(m.name)))
+                        print(self.t.cyan("\t\t\t--> method : {} {} {}".format(m.get_access_flags_string(), m.name, m.get_descriptor())))
                 print("\n")
             else:
                 CommandError("class_tree : classes.dex not loaded (!)")
@@ -552,7 +551,7 @@ class Run(Lobotomy):
                 print(self.t.cyan("\t--> [{}] {}"
                                   .format(i, item)))
             print("\n")
-            selection = raw_input(self.t.yellow("\t--> Select config : "))
+            selection = raw_input(self.t.yellow("[{}] Select config : ".format(datetime.now())))
             try:
                 index = int(selection)
             except ValueError:
