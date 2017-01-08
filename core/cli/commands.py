@@ -27,12 +27,11 @@ class CmdArgumentException(Exception):
         self.cmdargs = cmdargs
         self.doc = doc
 
-    def __str__(self):
-        msg = [self.doc]
-        if self.cmdargs:
-            msg.insert(0, "\n\t{0} : {1} (!)".format("Command not found",
-                                                 self.cmdargs))
-        return "\n\n".join(msg)
+        def __str__(self):
+            msg = [self.doc]
+            if self.cmdargs:
+                msg.insert(0, "\n\t{0} : {1} (!)".format("Command not found", self.cmdargs))
+            return "\n\n".join(msg)
 
 
 def cmd_arguments(expected_args):
@@ -298,23 +297,16 @@ class Run(Lobotomy):
         """
         := binja
         """
-        rpc = None
-        functions = None
-
         try:
-            import xmlrpclib
-            rpc = xmlrpclib.ServerProxy('http://localhost:6666/lobotomy')
-            functions = rpc.jni()
-            if functions:
-                self.logger.log("info", "Found JNI methods (!)")
-                print("\n")
-                for f in functions:
-                    print(self.t.cyan("\t--> {}".format(f)))
-                print("\n")
-            else:
-                self.logger.info("Registered JNI functions not found (!)")
+            from .binja import Run
+            run = Run(self.files, self.apk)
+            run.prompt = self.t.cyan("(binja) ")
+            run.ruler = self.t.cyan("-")
+            run.cmdloop()
         except Exception as e:
             CommandError("binja : {}".format(e))
+
+
 
     def complete_files(self, *args):
         return self._cmd_completer("files", *args)
