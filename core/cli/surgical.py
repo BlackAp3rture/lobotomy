@@ -183,22 +183,23 @@ class Run(SurgicalCmd):
                                     # tuples
                                     self.methods_api_usage = surgical_lib.search()
                                 else:
-                                    self.logger.surgical_log("warn","Method not found (!)")
+                                    self.logger.surgical_log("warn", "Method not found (!)")
             # Analyze the processed method list
             elif arg0 == "analyzed":
                 if args[0].split(" ")[1]:
                     arg1 = args[0].split(" ")[1]
-                # List the methods that have been processed
-                if arg1 == "list":
-                    if self.methods_api_usage:
-                        print("\n")
-                        for i, m in enumerate(self.methods_api_usage):
-                            print(self.t.cyan("\t--> [{}] {} -> {} "
-                                              .format(i, m[0].class_name,
-                                                      m[0].name)))
-                        print("\n")
-                    else:
-                        SurgicalError("API usage not found (!)")
+                    # List the methods that have been processed
+                    if arg1 == "list":
+                        print(self.methods_api_usage)
+                        if self.methods_api_usage:
+                            print("\n")
+                            for i, m in enumerate(self.methods_api_usage):
+                                print(self.t.cyan("\t--> [{}] {} -> {} "
+                                                  .format(i, m[0].class_name,
+                                                          m[0].name)))
+                            print("\n")
+                        else:
+                            SurgicalError("API usage not found (!)")
                 # Select from the processed method list
                 elif arg1 == "select":
                     if self.methods_api_usage:

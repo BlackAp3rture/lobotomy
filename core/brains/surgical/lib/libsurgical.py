@@ -86,5 +86,7 @@ class SurgicalLib(object):
                 process_methods = self.process_methods(found_methods)
                 if process_methods:
                     return process_methods
+            else:
+                self.logger.surgical_log("info", "No results found (!)")
         except Exception as e:
             SurgicalLibError(e.message)
