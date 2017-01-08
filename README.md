@@ -18,7 +18,7 @@ Lobotomy is a command line based Android reverse engineering tool.  What is in t
 
 ### Features
     
-|Feature|Description-|Status|
+|Feature|Description |Status|
 |:------|:-----------|:-----|
 |Components|Enumerate AndroidManifest.xml components|+|
 |Permission|Enumerate declared and used ```AndroidManifest.xml``` permissions|+|
@@ -37,19 +37,6 @@ Lobotomy is a command line based Android reverse engineering tool.  What is in t
 
 ### Building 
 #### OSX
-#### Building Requirements for python-adb
-```
-brew install openssl
-```
-```
-brew install swig
-```
-```
-env LDFLAGS="-L$(brew --prefix openssl)/lib" \
-CFLAGS="-I$(brew --prefix openssl)/include" \
-SWIG_FEATURES="-cpperraswarn -includeall -I$(brew --prefix openssl)/include" \
-```
-
 **Create a Python Virtual Environment for Lobotomy** 
 ```
 virtualenv -p /usr/bin/python2.7 lobotomy
