@@ -9,6 +9,7 @@ from core.brains.surgical.modules.zip import ZipModule
 from core.brains.surgical.modules.socket import SocketModule
 from core.brains.surgical.modules.system import SystemModule
 from core.brains.surgical.modules.crypto import CryptoModule
+from core.brains.surgical.modules.webview import WebViewModule
 from pygments import highlight
 from pygments.lexers import JavaLexer
 from pygments.formatters import TerminalFormatter
@@ -68,11 +69,13 @@ class Run(SurgicalCmd):
         self.socket = SocketModule()
         self.system = SystemModule()
         self.crypto = CryptoModule()
+        self.webview = WebViewModule()
         self.modules = [m for m in self.zip,
                         self.intent,
                         self.socket,
                         self.system,
-                        self.crypto]
+                        self.crypto,
+                        self.webview]
         self.target_module = None
         self.methods_api_usage = list()
 
@@ -199,27 +202,27 @@ class Run(SurgicalCmd):
                             print("\n")
                         else:
                             SurgicalError("API usage not found (!)")
-                # Select from the processed method list
-                elif arg1 == "select":
-                    if self.methods_api_usage:
-                        selection = raw_input(self.t.yellow("[{}] ".format(datetime.now())) + "Select method : ")
-                        try:
-                            index = int(selection)
-                        except ValueError:
-                            index = -1
-                        for i, m in enumerate(self.methods_api_usage):
-                            if selection == m[0].name or i == index:
-                                print("\n")
-                                print(self.t.cyan("\t--> Class : {}".format(m[0].class_name)))
-                                print(self.t.cyan("\t\t--> Method : {}".format(m[0].name)))
-                                print(self.t.cyan("\t\t\t --> XREFS ###########"))
-                                self.u.print_xref("T", m[1].method.XREFto.items)
-                                self.u.print_xref("F", m[1].method.XREFfrom.items)
-                                print("\n")
-                                print(highlight(m[2],
-                                                JavaLexer(),
-                                                TerminalFormatter()))
-                    else:
-                        SurgicalError("API usage not found (!)")
+                    # Select from the processed method list
+                    if arg1 == "select":
+                        if self.methods_api_usage:
+                            selection = raw_input(self.t.yellow("[{}] ".format(datetime.now())) + "Select method : ")
+                            try:
+                                index = int(selection)
+                            except ValueError:
+                                index = -1
+                            for i, m in enumerate(self.methods_api_usage):
+                                if selection == m[0].name or i == index:
+                                    print("\n")
+                                    print(self.t.cyan("\t--> Class : {}".format(m[0].class_name)))
+                                    print(self.t.cyan("\t\t--> Method : {}".format(m[0].name)))
+                                    print(self.t.cyan("\t\t\t --> XREFS ###########"))
+                                    self.u.print_xref("T", m[1].method.XREFto.items)
+                                    self.u.print_xref("F", m[1].method.XREFfrom.items)
+                                    print("\n")
+                                    print(highlight(m[2],
+                                                    JavaLexer(),
+                                                    TerminalFormatter()))
+                        else:
+                            SurgicalError("API usage not found (!)")
         except Exception as e:
             SurgicalError(e.message)
