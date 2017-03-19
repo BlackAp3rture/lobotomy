@@ -466,7 +466,10 @@ class Run(Lobotomy):
                     # We don't care about Android support classes or resource
                     # classes
                     if c.name.startswith("Landroid") or \
-                            c.name.split("/")[-1].startswith("R"):
+                            c.name.split("/")[-1].startswith("R") or \
+                            "google" in c.name or \
+                            "android" in c.name or \
+                            "log4j" in c.name:
                         continue
                     print("\n")
                     print(self.t.yellow("\t--> class : {} {}".format(c.get_access_flags_string(), c.name)))
