@@ -249,6 +249,22 @@ class Run(Lobotomy):
         except Exception as e:
             CommandError("surgical : {}".format(e))
 
+    def complete_scalpel(self, *args):
+        return self._cmd_completer("scalpel", *args)
+
+    def do_scalpel(self, *args):
+        """
+        := scalpel
+        """
+        try:
+            from .scalpel import Run
+            run = Run(self.vm, self.vmx)
+            run.prompt = self.t.yellow("(scalpel) ")
+            run.ruler = self.t.yellow("-")
+            run.cmdloop()
+        except Exception as e:
+            CommandError("surgical : {}".format(e))
+
     def complete_attacksurface(self, *args):
         return self._cmd_completer("attacksurface", *args)
 
@@ -559,6 +575,7 @@ class Run(Lobotomy):
                         break
                 with open("".join([macro, "/", selection]), "rb") as config:
                     # Load the config as JSON
+                    # Being parsing the config for operations
                     json = loads(config.read())
                     if json:
                         for k, v in json.items():
@@ -566,14 +583,12 @@ class Run(Lobotomy):
                                 if v:
                                     apk_path = str(v)
                                     # Call operate() with the path to apk
-                                    self.do_operate("apk {}"
-                                                    .format(apk_path))
+                                    self.do_operate("apk {}".format(apk_path))
                                     return
                                 else:
-                                    CommandError("macro : Path to APK not found in {}"
-                                                 .format(selection))
+                                    CommandError("macro : Path to APK not found in {}".format(selection))
+
                             else:
-                                CommandError("macro : Error loading {} as JSON"
-                                             .format(selection))
+                                CommandError("macro : Error loading {} as JSON".format(selection))
         except Exception as e:
             CommandError("macro : {}".format(e))
