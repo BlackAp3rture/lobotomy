@@ -78,3 +78,39 @@ class ADB(object):
 
     def console(self):
         pass
+
+
+class Device(object):
+    def __init__(self, dev_id, project_dir):
+        self.serial, self.desc = dev_id
+        self.adb = ADB(project_dir)
+        self.adb.set_serial(self.serial)
+        
+    def __str__(self):
+        return "Device : {}".format(self.desc)
+
+    def shell(self, cmd, **kwargs):
+        """
+        """
+        return self.adb.cmd("shell " + cmd, **kwargs)
+
+    def su(self, cmd, **kwargs):
+        """
+        """
+        return self.shell("su -c '%s'" % cmd, **kwargs)
+
+    def get_pids(self, name):
+        """
+        """
+        stdout, x = self.shell("ps -x")
+        pids = []
+        for line in stdout.split("\n"):
+            if name in line:
+                pid = filter(lambda x: x, line.split(" "))[1]
+                pids.append((pid, line))
+        return pids
+
+    def kill_proc(self, pid):
+        """
+        """
+        stdout, x = self.su("kill -9 {}".format(pid))

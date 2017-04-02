@@ -538,6 +538,37 @@ class Run(Lobotomy):
         except Exception as e:
             CommandError("ui : {}".format(e))
 
+    def complete_device(self, *args):
+        return self._cmd_completer("device", *args)
+
+    @cmd_arguments(["list"])
+    def do_device(self, *args):
+        """
+        := device list
+        """
+        # Locals
+        arg0 = args[0]
+        devices = None
+        serial = None
+        name = None
+
+        try:
+            if arg0 == "list":
+                from core.brains.device.adb.wrapper import ADB
+                a = ADB("".join([path.dirname(path.realpath(__file__)), "/../include/"]))
+                devices = a.get_devices()
+                if devices:
+                    print("\n")
+                    for d in devices:
+                        # TODO Fix if needed
+                        # Might not be the most efficent way of processing
+                        serial = d[0]
+                        name = d[1].split(":")[-1]
+                        print(self.t.yellow("\t--> device : {} : {}".format(serial, name)))
+                    print("\n")
+        except Exception as e:
+            CommandError("device : {}".format(e))
+
     def complete_macro(self, *args):
         return self._cmd_completer("macro", *args)
 
