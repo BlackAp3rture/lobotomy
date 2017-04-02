@@ -3,5 +3,5 @@ blessings>=1.6
 pygments>=2.1.3
 ipython
 libusb1>=1.6
-pyreadline
+pyreadline>=2.1
 pyelftools
