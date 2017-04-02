@@ -223,8 +223,7 @@ class Run(Lobotomy):
                         CommandError("APK not loaded (!)")
             elif arg0 == "dex":
                 if arg1:
-                    self.logger.log("info", "Loading : {} ..."
-                                    .format(arg1.split("/")[-1]))
+                    self.logger.log("info", "Loading : {} ...".format(arg1.split("/")[-1]))
                     self.dex = arg1
                     self.process_vm(dex=True)
         except ImportError as e:
@@ -321,8 +320,6 @@ class Run(Lobotomy):
             run.cmdloop()
         except Exception as e:
             CommandError("binja : {}".format(e))
-
-
 
     def complete_files(self, *args):
         return self._cmd_completer("files", *args)
