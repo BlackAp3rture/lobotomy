@@ -85,7 +85,7 @@ class Device(object):
         self.serial, self.desc = dev_id
         self.adb = ADB(project_dir)
         self.adb.set_serial(self.serial)
-        
+
     def __str__(self):
         return "Device : {}".format(self.desc)
 

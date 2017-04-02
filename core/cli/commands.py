@@ -569,6 +569,39 @@ class Run(Lobotomy):
         except Exception as e:
             CommandError("device : {}".format(e))
 
+    def complete_adb(self, *args):
+        return self._cmd_completer("adb", *args)
+
+    @cmd_arguments(["shellcmd", "cmd"])
+    def do_adb(self, *args):
+        """
+        := adb shellcmd ps -x
+        := adb cmd version
+        """
+        # Locals
+        arg0 = args[0].split(" ")[0]
+        arg1 = args[0].split(" ")[1]
+
+        try:
+            if arg0 == "shellcmd":
+                if arg1:
+                    from core.brains.device.adb.wrapper import ADB
+                    a = ADB("".join([path.dirname(path.realpath(__file__)), "/../include/"]))
+                    results = a.cmd("".join(["shell ", arg1]))[0]
+                    print(results)
+                else:
+                    CommandError("adb : command not found (!)")
+            if arg0 == "cmd":
+                if arg1:
+                    from core.brains.device.adb.wrapper import ADB
+                    a = ADB("".join([path.dirname(path.realpath(__file__)), "/../include/"]))
+                    results = a.cmd(arg1)[0]
+                    print("\n{}\n".format(results))
+                else:
+                    CommandError("adb : command not found (!)")
+        except Exception as e:
+            CommandError("adb : {}".format(e))
+
     def complete_macro(self, *args):
         return self._cmd_completer("macro", *args)
 
