@@ -538,13 +538,13 @@ class Run(Lobotomy):
         except Exception as e:
             CommandError("ui : {}".format(e))
 
-    def complete_device(self, *args):
-        return self._cmd_completer("device", *args)
+    def complete_devices(self, *args):
+        return self._cmd_completer("devices", *args)
 
     @cmd_arguments(["list"])
-    def do_device(self, *args):
+    def do_devices(self, *args):
         """
-        := device list
+        := devices list
         """
         # Locals
         arg0 = args[0]
