@@ -576,7 +576,6 @@ class Run(Lobotomy):
     def do_adb(self, *args):
         """
         With adb binary in the 'include' folder
-        Format Example:
 
         := adb shellcmd ps -x
         := adb cmd version
