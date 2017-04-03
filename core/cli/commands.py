@@ -575,6 +575,9 @@ class Run(Lobotomy):
     @cmd_arguments(["shellcmd", "cmd"])
     def do_adb(self, *args):
         """
+        With adb binary in the 'include' folder
+        Format Example:
+
         := adb shellcmd ps -x
         := adb cmd version
         """
@@ -605,51 +608,15 @@ class Run(Lobotomy):
     def complete_macro(self, *args):
         return self._cmd_completer("macro", *args)
 
-    def do_macro(self, args):
+
+    def do_macro(self, *args):
         """
         := macro
         """
-        # Locals
-        directory_items = None
-        macro = path.join(self.ROOT_DIR, "macro")
-        selection = None
-        apk_path = None
-        json = None
-
         try:
-            print("\n")
-            directory_items = listdir(macro)
-            for i, item in enumerate(directory_items):
-                print(self.t.cyan("\t--> [{}] {}"
-                                  .format(i, item)))
-            print("\n")
-            selection = raw_input(self.t.yellow("[{}] Select config : ".format(datetime.now())))
-            try:
-                index = int(selection)
-            except ValueError:
-                index = -1
-            print("\n")
-            if selection:
-                for i, item in enumerate(directory_items):
-                    if selection == item or i == index:
-                        selection = item
-                        break
-                with open("".join([macro, "/", selection]), "rb") as config:
-                    # Load the config as JSON
-                    # Being parsing the config for operations
-                    json = loads(config.read())
-                    if json:
-                        for k, v in json.items():
-                            if k == "apk":
-                                if v:
-                                    apk_path = str(v)
-                                    # Call operate() with the path to apk
-                                    self.do_operate("apk {}".format(apk_path))
-                                    return
-                                else:
-                                    CommandError("macro : Path to APK not found in {}".format(selection))
+            from core.brains.macro.macro import Macro
+            self.macro = Macro(self)
+            self.macro.macro_generator()
 
-                            else:
-                                CommandError("macro : Error loading {} as JSON".format(selection))
         except Exception as e:
             CommandError("macro : {}".format(e))
